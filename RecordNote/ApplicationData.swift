@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import AVFoundation
 
 struct recordData: Identifiable, Hashable {
     let id = UUID()
