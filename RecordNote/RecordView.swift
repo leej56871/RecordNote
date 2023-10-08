@@ -43,11 +43,11 @@ struct RecordView: View {
                             let fileURL = dir.appendingPathComponent(currentRecord!.getDate + ".m4a")
                             if !playState {
                                 pSession = playSession(path: path)
-                                pSession?.startPlaying(fileUrl: fileURL)
+                                pSession?.startPlaying(fileUrl: fileURL, duration: currentRecord!.duration)
                                 playState.toggle()
                             }
                             else {
-                                pSession?.stopPlaying(url: fileURL)
+                                pSession?.stopPlaying()
                                 playState.toggle()
                             }
                         }, label: {
@@ -57,16 +57,15 @@ struct RecordView: View {
                                 Text(appData.favRecordInfo[index].durationInString)
                                 Spacer()
                                 Button(action: {
-                                    appData.favRecordInfo[index].fav.toggle()
-                                    appData.recordInfo.append(appData.favRecordInfo[index])
-                                    appData.favRecordInfo.remove(at: index)
-                                    
+                                    print("Index is : ", index)
+                                    appData.favToRec(index: index)
                                 }, label: {
                                     Image(systemName: "star.fill")
                                         .foregroundColor(Color.yellow)
                                 })
                             }.padding()
                                 .overlay(Rectangle().stroke(Color.gray, lineWidth: 1))
+                                .foregroundColor(currentRecord == appData.favRecordInfo[index] && playState ? Color.red : Color.blue)
                         })
                     }.padding(EdgeInsets(top: 0, leading: 5, bottom: 0, trailing: 5))
                     
@@ -77,11 +76,11 @@ struct RecordView: View {
                             let fileURL = dir.appendingPathComponent(currentRecord!.getDate + ".m4a")
                             if !playState {
                                 pSession = playSession(path: path)
-                                pSession?.startPlaying(fileUrl: fileURL)
+                                pSession?.startPlaying(fileUrl: fileURL, duration: currentRecord!.duration)
                                 playState.toggle()
                             }
                             else {
-                                pSession?.stopPlaying(url: fileURL)
+                                pSession?.stopPlaying()
                                 playState.toggle()
                             }
                         }, label: {
@@ -91,15 +90,14 @@ struct RecordView: View {
                                 Text(appData.recordInfo[index].durationInString)
                                 Spacer()
                                 Button(action: {
-                                    appData.recordInfo[index].fav.toggle()
-                                    appData.favRecordInfo.append(appData.recordInfo[index])
-                                    appData.recordInfo.remove(at: index)
+                                    appData.recToFav(index: index)
                                 }, label: {
                                     Image(systemName: "star.fill")
                                         .foregroundColor(Color.gray)
                                 })
                             }.padding()
                                 .overlay(Rectangle().stroke(Color.gray, lineWidth: 1))
+                                .foregroundColor(currentRecord == appData.recordInfo[index] && playState ? Color.red : Color.blue)
                         })
                     }.padding(EdgeInsets(top: 0, leading: 5, bottom: 0, trailing: 5))
                     
@@ -117,7 +115,7 @@ struct RecordView: View {
                 recordState.toggle()
                 if recordState {
                     tempStart = dateFormatter(date: Date())
-                    currentRecord = recordData(name: tempStart, startDate: tempStart, endDate: "0000-00-00-00-00-00", fav: false, tags: [])
+                    currentRecord = recordData(name: tempStart + ".m4a", startDate: tempStart, endDate: "0000-00-00-00-00-00", fav: false, tags: "")
                     rSession = recordSession(record: currentRecord!, path: path)
                     rSession!.startRecording()
                 }
@@ -126,8 +124,8 @@ struct RecordView: View {
                     rSession!.stopRecording()
                     currentRecord!.endDate = tempEnd
                     currentRecord!.calculateDuration(startDate: currentRecord!.startDate, endDate: currentRecord!.endDate)
-                    currentRecord!.url = dir.appendingPathComponent(currentRecord!.startDate + "m4a")
                     appData.addRecord(recordData: currentRecord!)
+                    appData.addToRealm(data: appData.generateRealmRecord(recordData: currentRecord!))
                 }
                 }, label: {
                     Image(systemName: recordState ? "pause.circle" : "record.circle")
@@ -136,7 +134,9 @@ struct RecordView: View {
                     .foregroundColor(Color.red)
             })
         }.onAppear(perform: {
-            
+            NotificationCenter.default.addObserver(forName: Notification.Name("Done playing"), object: nil, queue: nil, using: { _ in
+                playState.toggle()
+            })
         })
     }
     
@@ -195,7 +195,7 @@ class recordSession {
     
 }
 
-class playSession {
+class playSession: NSObject, AVAudioPlayerDelegate {
     var session = AVAudioSession.sharedInstance()
     var player: AVAudioPlayer!
     let path: URL
@@ -206,32 +206,35 @@ class playSession {
         self.dir = path.appendingPathComponent("recordNote")
     }
     
-    func startPlaying(fileUrl: URL) {
+    func startPlaying(fileUrl: URL, duration: Int) {
         do {
             try session.overrideOutputAudioPort(AVAudioSession.PortOverride.speaker)
         } catch {
             print("Error3")
         }
-        
         do {
             let result = try FileManager.default.contentsOfDirectory(at: path, includingPropertiesForKeys: nil)
-            for i in result {
-                print("file url is \(fileUrl)")
-                print(i)
-                print("dir is \(dir)")
-            }
             player = try AVAudioPlayer(contentsOf: fileUrl)
             player.prepareToPlay()
             player.play()
-            
+            player.delegate = self
         } catch {
             print("Error4")
         }
-                                        
     }
     
-    func stopPlaying(url: URL) {
+    func stopPlaying() {
         player.stop()
+    }
+    
+    func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+        if flag {
+            NotificationCenter.default.post(name: Notification.Name("Done playing"), object: nil)
+            stopPlaying()
+        }
+        else {
+            print("Playback Failed!")
+        }
     }
 }
 

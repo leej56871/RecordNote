@@ -14,9 +14,11 @@
 		329A280B2AC3288F00F477B4 /* ApplicationData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 329A280A2AC3288F00F477B4 /* ApplicationData.swift */; };
 		32C09D392AC40969008A71C4 /* RecordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32C09D382AC40969008A71C4 /* RecordView.swift */; };
 		32C09D3B2AC40976008A71C4 /* NoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32C09D3A2AC40976008A71C4 /* NoteView.swift */; };
+		60BA8233101D28D7C71DC411 /* Pods_RecordNote.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2D9C8BD4E2415491A6D60463 /* Pods_RecordNote.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2D9C8BD4E2415491A6D60463 /* Pods_RecordNote.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RecordNote.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		329A27F92AC3285800F477B4 /* RecordNote.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RecordNote.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		329A27FC2AC3285800F477B4 /* RecordNoteApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordNoteApp.swift; sourceTree = "<group>"; };
 		329A27FE2AC3285800F477B4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -26,6 +28,8 @@
 		32C09D382AC40969008A71C4 /* RecordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordView.swift; sourceTree = "<group>"; };
 		32C09D3A2AC40976008A71C4 /* NoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteView.swift; sourceTree = "<group>"; };
 		32E083142AC9463700C0EDC4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		69631675ED9EC2C3D5EB259C /* Pods-RecordNote.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RecordNote.release.xcconfig"; path = "Target Support Files/Pods-RecordNote/Pods-RecordNote.release.xcconfig"; sourceTree = "<group>"; };
+		C494785CD54DD23A3C9E6B0C /* Pods-RecordNote.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RecordNote.debug.xcconfig"; path = "Target Support Files/Pods-RecordNote/Pods-RecordNote.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -33,6 +37,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				60BA8233101D28D7C71DC411 /* Pods_RecordNote.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -44,6 +49,8 @@
 			children = (
 				329A27FB2AC3285800F477B4 /* RecordNote */,
 				329A27FA2AC3285800F477B4 /* Products */,
+				6139436D29298F547A953F5C /* Pods */,
+				B01217BF5A390175B5E1E3D8 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -78,6 +85,23 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
+		6139436D29298F547A953F5C /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				C494785CD54DD23A3C9E6B0C /* Pods-RecordNote.debug.xcconfig */,
+				69631675ED9EC2C3D5EB259C /* Pods-RecordNote.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		B01217BF5A390175B5E1E3D8 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				2D9C8BD4E2415491A6D60463 /* Pods_RecordNote.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -85,9 +109,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 329A28072AC3285900F477B4 /* Build configuration list for PBXNativeTarget "RecordNote" */;
 			buildPhases = (
+				4C19941F7B034F39E08F0B7A /* [CP] Check Pods Manifest.lock */,
 				329A27F52AC3285800F477B4 /* Sources */,
 				329A27F62AC3285800F477B4 /* Frameworks */,
 				329A27F72AC3285800F477B4 /* Resources */,
+				BCAA5F6F5577FDF60C077F13 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -142,6 +168,48 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		4C19941F7B034F39E08F0B7A /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-RecordNote-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		BCAA5F6F5577FDF60C077F13 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-RecordNote/Pods-RecordNote-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-RecordNote/Pods-RecordNote-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RecordNote/Pods-RecordNote-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		329A27F52AC3285800F477B4 /* Sources */ = {
@@ -275,6 +343,7 @@
 		};
 		329A28082AC3285900F477B4 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = C494785CD54DD23A3C9E6B0C /* Pods-RecordNote.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -308,6 +377,7 @@
 		};
 		329A28092AC3285900F477B4 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 69631675ED9EC2C3D5EB259C /* Pods-RecordNote.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
