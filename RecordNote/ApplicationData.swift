@@ -44,6 +44,52 @@ class RealmRecord: Object {
     }
 }
 
+class RealmNote: Object {
+    @Persisted var name: String
+    @Persisted (primaryKey: true) var date: String
+    @Persisted var fav: Bool
+    @Persisted var note: String
+
+    convenience init(name: String, date: String, note: String, fav: Bool) {
+        self.init()
+        self.name = name
+        self.date = date
+        self.note = note
+        self.fav = fav
+    }
+    
+    var getName: String {
+        return name
+    }
+    var getDate: String {
+        return date
+    }
+    var getNote: String {
+        return note
+    }
+}
+
+struct noteData: Identifiable, Hashable {
+    let id = UUID()
+    var name: String
+    var note: String
+    var date: String
+    var fav: Bool
+    
+    var getName: String {
+        return name
+    }
+    var getDate: String {
+        return date
+    }
+    var getNote: String {
+        return note
+    }
+    mutating func fixNote(newNote: String) -> Void {
+        note = newNote
+    }
+}
+
 struct recordData: Identifiable, Hashable {
     let id = UUID()
     var name: String
@@ -116,44 +162,49 @@ public func dateFormatter(date: Date) -> String {
 }
 
 class ApplicationData: ObservableObject {
-    @Published var recordInfo: [recordData]
-    @Published var favRecordInfo: [recordData]
+    @Published var recordInfo: [recordData] = []
+    @Published var favRecordInfo: [recordData] = []
+    @Published var noteInfo: [noteData] = []
+    @Published var favNoteInfo: [noteData] = []
     let realm = try! Realm()
+    let path = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
     
     init() {
-        recordInfo = []
-        favRecordInfo = []
-        let path = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         let dir = path.appendingPathComponent("recordNote")
         do {
             let contents = try FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: nil)
             for i in contents {
                 let temp = i.absoluteString.components(separatedBy: "/").last!.trimmingCharacters(in: [" "])
                 if let temp = realm.object(ofType: RealmRecord.self, forPrimaryKey: temp) {
-                    print("There is data in realm!")
                     temp.fav ? favRecordInfo.append(recordData(name: temp.name, startDate: temp.startDate, endDate: temp.endDate, fav: temp.fav, tags: temp.tags)) : recordInfo.append(recordData(name: temp.name, startDate: temp.startDate, endDate: temp.endDate, fav: temp.fav, tags: temp.tags))
                 }
             }
         } catch {
             print("Error in init() of ApplicationData! or no such data in realm yet!")
         }
-        print("recordInfo: ", recordInfo)
-        print("favrecordInfo: ", favRecordInfo)
-        
-        
-        
+        let notes = realm.objects(RealmNote.self)
+        for i in notes {
+            i.fav ? favNoteInfo.append(noteData(name: i.name, note: i.note, date: i.date, fav: i.fav)) : noteInfo.append(noteData(name: i.name, note: i.note, date: i.date, fav: i.fav))
+        }
     }
     func generateRealmRecord(recordData: recordData) -> RealmRecord {
         return RealmRecord(name: recordData.name, startDate: recordData.startDate, endDate: recordData.endDate, fav: recordData.fav, duration: recordData.getDuration, tags: recordData.tags)
     }
-    
+    func generateRealmNote(noteData: noteData) -> RealmNote {
+        return RealmNote(name: noteData.name, date: noteData.date, note: noteData.note, fav: noteData.fav)
+    }
     func addRecord(recordData: recordData) -> Void {
         recordInfo.append(recordData)
     }
     func addFavRecord(recordData: recordData) -> Void {
         favRecordInfo.append(recordData)
     }
-    func addToRealm(data: RealmRecord) -> Void {
+    func addRecordToRealm(data: RealmRecord) -> Void {
+        try! realm.write {
+            realm.add(data, update: .modified)
+        }
+    }
+    func addNoteToRealm(data: RealmNote) -> Void {
         try! realm.write {
             realm.add(data, update: .modified)
         }
@@ -168,18 +219,46 @@ class ApplicationData: ObservableObject {
             print("No such Data in Realm!")
         }
     }
-    
     func recToFav(index: Array.Index) -> Void {
         recordInfo[index].fav.toggle()
         favRecordInfo.append(recordInfo[index])
-        addToRealm(data: generateRealmRecord(recordData: recordInfo[index]))
+        addRecordToRealm(data: generateRealmRecord(recordData: recordInfo[index]))
         recordInfo.remove(at: index)
     }
-    
     func favToRec(index: Array.Index) -> Void {
         favRecordInfo[index].fav.toggle()
         recordInfo.append(favRecordInfo[index])
-        addToRealm(data: generateRealmRecord(recordData: favRecordInfo[index]))
+        addRecordToRealm(data: generateRealmRecord(recordData: favRecordInfo[index]))
         favRecordInfo.remove(at: index)
+    }
+    
+    func addNote(noteData: noteData) -> Void {
+        noteInfo.append(noteData)
+        addNoteToRealm(data: generateRealmNote(noteData: noteData))
+    }
+    func updateNote(noteData: noteData) -> Void {
+        let target = realm.objects(RealmNote.self).where {
+            $0.getDate == noteData.getDate
+        }.first!
+        try! realm.write {
+            target.name = noteData.getName
+            target.note = noteData.getNote
+            target.fav = noteData.fav
+        }
+        let after = realm.objects(RealmNote.self).where {
+            $0.getDate == noteData.getDate
+        }.first!
+    }
+    func noteToFav(index: Array.Index) -> Void {
+        noteInfo[index].fav.toggle()
+        favNoteInfo.append(noteInfo[index])
+        addNoteToRealm(data: generateRealmNote(noteData: noteInfo[index]))
+        noteInfo.remove(at: index)
+    }
+    func favToNote(index: Array.Index) -> Void {
+        favNoteInfo[index].fav.toggle()
+        noteInfo.append(favNoteInfo[index])
+        addNoteToRealm(data: generateRealmNote(noteData: favNoteInfo[index]))
+        favNoteInfo.remove(at: index)
     }
 }

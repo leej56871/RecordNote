@@ -23,17 +23,23 @@ struct RecordView: View {
     
     var body: some View {
         VStack {
-            Spacer()
             HStack {
                 Text("Name")
                     .fontWeight(.bold)
                 Spacer()
                 Text("Duration")
+                    .fontWeight(.bold)
                 Spacer()
                 Text("Fav")
+                    .fontWeight(.bold)
             }
             .padding()
             Divider()
+            HStack {
+                Spacer()
+                EditButton()
+            }
+            .padding()
             ScrollView {
                 LazyVStack {
                     ForEach(appData.favRecordInfo.indices, id: \.self) { index in
@@ -108,10 +114,9 @@ struct RecordView: View {
                 Image(systemName: "waveform")
                     .resizable()
 
-            }.padding()
+            }.padding() 
                 .opacity(recordState ? 1 : 0)
             Button(action: {
-                let dir = path.appendingPathComponent("recordNote")
                 recordState.toggle()
                 if recordState {
                     tempStart = dateFormatter(date: Date())
@@ -125,7 +130,7 @@ struct RecordView: View {
                     currentRecord!.endDate = tempEnd
                     currentRecord!.calculateDuration(startDate: currentRecord!.startDate, endDate: currentRecord!.endDate)
                     appData.addRecord(recordData: currentRecord!)
-                    appData.addToRealm(data: appData.generateRealmRecord(recordData: currentRecord!))
+                    appData.addRecordToRealm(data: appData.generateRealmRecord(recordData: currentRecord!))
                 }
                 }, label: {
                     Image(systemName: recordState ? "pause.circle" : "record.circle")
