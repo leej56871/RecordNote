@@ -24,7 +24,7 @@ struct NoteView: View {
                 else {
                     NoteEditView(targetIndex: $targetIndex, targetBool: $targetBool, editState: $editState, newNoteState: $newNoteState)
                 }
-            }
+            }.navigationBarBackButtonHidden(editState)
         }
     }
 }
@@ -60,19 +60,22 @@ struct NoteListView: View {
                 })
             }.padding()
             Spacer()
-            ScrollView {
-                LazyVStack(alignment: .leading) {
+            VStack {
+                List {
                     ForEach(appData.favNoteInfo.indices, id: \.self) { index in
                         Button(action: {
                             editState.toggle()
                             targetBool = true
                             targetIndex = index
-                            
                         }, label: {
                             Text(appData.favNoteInfo[index].getName)
+                                .font(.title)
                         })
                         
-                    }
+                    }.onDelete(perform: { indexSet in
+                        appData.deleteNote(date: appData.favNoteInfo[indexSet.first!].getDate)
+                        appData.favNoteInfo.remove(atOffsets: indexSet)
+                    })
                     ForEach(appData.noteInfo.indices, id: \.self) { index in
                         Button(action: {
                             editState.toggle()
@@ -80,10 +83,14 @@ struct NoteListView: View {
                             targetIndex = index
                         }, label: {
                             Text(appData.noteInfo[index].getName)
+                                .font(.title)
                         })
-                        
-                    }
+                    }.onDelete(perform: { indexSet in
+                        appData.deleteNote(date: appData.noteInfo[indexSet.first!].getDate)
+                        appData.noteInfo.remove(atOffsets: indexSet)
+                    })
                 }.padding()
+                    .listStyle(PlainListStyle())
             }
         }
     }

@@ -27,21 +27,14 @@ struct RecordView: View {
                 Text("Name")
                     .fontWeight(.bold)
                 Spacer()
-                Text("Duration")
-                    .fontWeight(.bold)
-                Spacer()
                 Text("Fav")
                     .fontWeight(.bold)
             }
             .padding()
             Divider()
-            HStack {
-                Spacer()
-                EditButton()
-            }
-            .padding()
-            ScrollView {
-                LazyVStack {
+            Spacer()
+            VStack {
+                List {
                     ForEach(appData.favRecordInfo.indices, id: \.self) { index in
                         Button(action: {
                             currentRecord = appData.favRecordInfo[index]
@@ -73,7 +66,11 @@ struct RecordView: View {
                                 .overlay(Rectangle().stroke(Color.gray, lineWidth: 1))
                                 .foregroundColor(currentRecord == appData.favRecordInfo[index] && playState ? Color.red : Color.blue)
                         })
-                    }.padding(EdgeInsets(top: 0, leading: 5, bottom: 0, trailing: 5))
+                    }.onDelete(perform: { indexSet in
+                        appData.deleteRecord(date: appData.favRecordInfo[indexSet.first!].getDate)
+                        appData.favRecordInfo.remove(atOffsets: indexSet)
+                    })
+                    .padding(EdgeInsets(top: 0, leading: 5, bottom: 0, trailing: 5))
                     
                     ForEach(appData.recordInfo.indices, id: \.self) { index in
                         Button(action: { 
@@ -105,15 +102,17 @@ struct RecordView: View {
                                 .overlay(Rectangle().stroke(Color.gray, lineWidth: 1))
                                 .foregroundColor(currentRecord == appData.recordInfo[index] && playState ? Color.red : Color.blue)
                         })
-                    }.padding(EdgeInsets(top: 0, leading: 5, bottom: 0, trailing: 5))
-                    
-                }
+                    }.onDelete(perform: { indexSet in
+                        appData.deleteRecord(date: appData.recordInfo[indexSet.first!].getDate)
+                        appData.recordInfo.remove(atOffsets: indexSet)
+                    })
+                    .padding(EdgeInsets(top: 0, leading: 5, bottom: 0, trailing: 5))
+                }.listStyle(PlainListStyle())
             }
             Spacer()
             VStack {
                 Image(systemName: "waveform")
                     .resizable()
-
             }.padding() 
                 .opacity(recordState ? 1 : 0)
             Button(action: {
@@ -146,6 +145,7 @@ struct RecordView: View {
     }
     
 }
+
 
 class recordSession {
     var session = AVAudioSession.sharedInstance()
@@ -218,7 +218,6 @@ class playSession: NSObject, AVAudioPlayerDelegate {
             print("Error3")
         }
         do {
-            let result = try FileManager.default.contentsOfDirectory(at: path, includingPropertiesForKeys: nil)
             player = try AVAudioPlayer(contentsOf: fileUrl)
             player.prepareToPlay()
             player.play()
